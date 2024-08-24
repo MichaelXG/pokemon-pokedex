@@ -4,7 +4,7 @@ import "./globals.scss";
 import Link from "next/link";
 import Image from "next/image";
 
-import { PokemonProvider } from "@/context/PokemonContext";
+import { PokemonProvider } from "../context/pokemonContext";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
