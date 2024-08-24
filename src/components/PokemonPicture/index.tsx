@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 import { getTypeBackgroundUrl } from "@/utils/typeUtils";
-import styles from "@/components/PokemonPicture/PokemonPicture.module.scss";
+import styles from "@/components/PokemonPicture/pokemonPicture.module.scss";
 import { pokemonFont } from "@/fonts";
 import { IPokemon } from "@/interfaces/IPokemon";
 import { formatId, formatName, LOGGING_ENABLED } from "@/utils/globalUtils";
