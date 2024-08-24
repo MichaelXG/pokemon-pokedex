@@ -3,7 +3,7 @@
 import { useState, useEffect, ChangeEvent, useRef } from "react";
 import Script from "next/script";
 
-import styles from "./PokemonSearch.module.scss";
+import styles from "./pokemonSearch.module.scss";
 
 interface PokemonSearchProps {
   hasNoResults: boolean;
