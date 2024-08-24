@@ -1,0 +1,48 @@
+{
+  "name": "pokemon-pokedex",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@lordicon/react": "^1.9.0",
+    "@mui/material": "^5.16.6",
+    "@react-spring/three": "^9.7.4",
+    "@react-three/drei": "^9.109.5",
+    "@react-three/fiber": "^8.17.5",
+    "@types/react-dom": "18.2.4",
+    "axios": "^1.7.3",
+    "chart.js": "^4.4.3",
+    "eslint": "8.42.0",
+    "eslint-config-next": "13.4.5",
+    "framer-motion": "^11.3.24",
+    "jquery": "^3.7.1",
+    "next": "13.4.5",
+    "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "18.2.0",
+    "react-slick": "^0.30.2",
+    "react-slider": "^2.0.6",
+    "slick-carousel": "^1.8.1",
+    "styled-components": "^6.1.12",
+    "swiper": "^11.1.9",
+    "three": "^0.167.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "@types/react": "^18.3.3",
+    "@types/react-slick": "^0.23.13",
+    "@types/three": "^0.167.1",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "sass": "^1.63.3",
+    "typescript": "^5.5.4"
+  }
+}

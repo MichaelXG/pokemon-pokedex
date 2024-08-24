@@ -1,0 +1,95 @@
+@import "../../app/variables.scss";
+
+/* Contêiner pai com flexbox */
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin: auto;
+}
+
+/* Configuração do contêiner dos Pokémons */
+.pokemons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+
+  justify-content: center; /* Centraliza os itens horizontalmente */
+  align-items: center; /* Centraliza os itens verticalmente */
+}
+
+/* Estilo específico para a página PokemonsList */
+.pokemonsListPage .imageContainer {
+  width: 200px;
+  height: 200px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Estilo geral para o contêiner de imagens */
+.imageContainer {
+  cursor: pointer;
+  position: relative;
+  width: auto;
+  height: 200px;
+  margin: 0 1px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Estilo do título */
+.title {
+  font-size: 26vw;
+  margin: 0;
+
+  @media screen and (min-width: $max-width) {
+    font-size: 30rem;
+  }
+}
+
+/* Estilo para a paginação */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.paginationButton {
+  padding: 10px 20px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+
+  &:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
+}
+
+.pageInfo {
+  margin: 0 10px;
+  font-size: 16px;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #0070f3;
+  cursor: pointer;
+}

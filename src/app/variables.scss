@@ -1,0 +1,19 @@
+// Define a largura máxima do contêiner para o layout
+$max-width: 1920px;
+
+$min-width: 415px;
+
+// Define a cor do texto
+$text-color: #fff;
+
+// Define um gradiente de fundo que vai do azul claro ao azul escuro
+$background: linear-gradient(#a5a7a8, #757577);
+
+// Define um plano de fundo da página home
+$background-image: url("/pokemon/home-01-background.png");
+
+// Define o caminho para o GIF do loader
+$loader-gif: url("/icons/loader.gif");
+
+// Variáveis padrão para o gradiente
+$default-colors: #ff7e5f, #feb47b, #6a82fb, #fc5c7d;

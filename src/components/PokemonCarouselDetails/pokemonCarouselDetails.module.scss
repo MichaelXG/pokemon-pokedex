@@ -1,0 +1,81 @@
+.details {
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 1rem 0;
+  width: 100%;
+
+  .PokemonCarouselDetails_details__m9jrC {
+    padding: 0 !important;
+  }
+}
+
+.detailsEvo {
+  width: 100%;
+}
+
+.mainEvo {
+  width: 100%;
+  min-height: 250px; /* Define a altura mínima */
+  border-radius: 0.5rem 2rem;
+  box-shadow: 0px 15px 20px -5px rgba(0, 0, 0, 0.5);
+  background: url("../../../public/pokemon/background.png") center/cover
+    no-repeat;
+  transition: all 0.3s ease-in-out;
+
+  /* Permitir ajuste automático da altura com base no conteúdo */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Distribui o conteúdo internamente */
+
+  /* Tornar responsivo */
+  @media (max-width: 768px) {
+    border-radius: 0.5rem;
+    min-height: auto; /* Remove a altura mínima em telas menores */
+  }
+}
+
+.table td {
+  padding-right: 2rem;
+  // font-weight: normal;
+  .label {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+.pokemon {
+  position: absolute;
+  left: 0;
+  height: 100%;
+}
+
+.pokemon img {
+  object-fit: contain;
+  object-position: center right;
+  width: 100%;
+}
+
+.title {
+  font-size: 3.5rem;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  text-transform: capitalize;
+  font-weight: 900;
+  color: rgb(55, 55, 95);
+}
+
+.genderRates {
+  display: flex !important;
+  justify-content: space-around !important; /* Espaça os itens igualmente com o mesmo espaço ao redor */
+  align-items: center !important; /* Alinha verticalmente ao centro */
+  width: 100% !important; /* Garante que o container ocupe toda a largura disponível */
+}
+
+.genderRates div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important; /* Garante que o conteúdo dos ícones fique centralizado */
+  margin: 0 !important; /* Remove qualquer margem extra */
+}

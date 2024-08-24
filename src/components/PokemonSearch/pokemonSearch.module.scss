@@ -1,0 +1,53 @@
+/* Container principal do componente de busca */
+.container {
+  position: relative;
+}
+
+/* Estilo para o campo de entrada de busca quando o input está expandido */
+.searchExpanded {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Estilo para o campo de entrada de busca */
+.searchInput {
+  height: 40px;
+  width: 300px; /* Ajuste conforme necessário */
+  background: rgba(119, 117, 117, 0);
+  border-radius: 25px;
+  color: #ffffff;
+  padding-left: 10px;
+  border: none; /* Remove a borda padrão */
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px; /* Espaço entre o campo de entrada e o ícone de fechar */
+}
+
+/* Aplica a cor de erro quando não há resultados */
+.searchInput.error {
+  color: #ff0000;
+}
+
+/* Estilo para o ícone de busca */
+.iconeBusca {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1); /* Aumenta o ícone ao passar o mouse */
+  }
+}
+
+/* Estilo para o ícone de fechar */
+.iconeFechar {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1); /* Aumenta o ícone ao passar o mouse */
+  }
+}

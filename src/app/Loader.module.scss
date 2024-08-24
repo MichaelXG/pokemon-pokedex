@@ -1,0 +1,25 @@
+@import "./variables.scss"; // Ajuste o caminho conforme necessário
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: $background; // Cor de fundo com opacidade
+
+  .loader {
+    width: 100px; // Ajuste o tamanho conforme necessário
+    height: 100px; // Ajuste o tamanho conforme necessário
+    background-image: $loader-gif; // Caminho correto para o arquivo GIF na pasta public
+    background-size: cover;
+    background-position: center;
+  }
+
+  .loadingMessage {
+    margin-top: 20px; // Ajuste o espaço acima da mensagem conforme necessário
+    font-size: 1.2rem; // Ajuste o tamanho da fonte conforme necessário
+    color: #333; // Cor do texto da mensagem
+    text-align: center; // Centraliza o texto
+  }
+}

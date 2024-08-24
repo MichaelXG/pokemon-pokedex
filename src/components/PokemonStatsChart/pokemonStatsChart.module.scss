@@ -1,0 +1,24 @@
+@import "../../app/variables.scss";
+
+/* Contêiner do gráfico de barras */
+.barChartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* O contêiner ocupará 100% da largura do pai */
+  max-width: $max-width; /* Define a largura máxima para o contêiner */
+  height: auto; /* Altura automática para manter a proporção */
+  position: relative;
+  // padding: 0.5rem; /* Adiciona um pouco de preenchimento para responsividade */
+  box-sizing: border-box; /* Inclui o padding e a borda na largura e altura totais */
+  // border-bottom: 1rem;
+}
+
+/* Canvas dentro do contêiner */
+.barChartContainer canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 600px !important; /* O canvas ocupará a largura total do contêiner */
+  height: 250px !important; /* A altura do canvas será ajustada automaticamente */
+}

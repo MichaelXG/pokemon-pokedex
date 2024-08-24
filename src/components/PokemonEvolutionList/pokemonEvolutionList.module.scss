@@ -1,0 +1,156 @@
+@import "../../app/variables.scss";
+
+/* Contêiner pai com flexbox */
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Centraliza o conteúdo verticalmente */
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Garante que o contêiner ocupe toda a altura da viewport */
+  margin: auto;
+}
+
+/* Configuração do contêiner dos Pokémons */
+.pokemons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+  max-width: $max-width; /* Limita a largura máxima para centralizar melhor */
+
+  justify-content: center; /* Centraliza os itens horizontalmente */
+  align-items: center; /* Centraliza os itens verticalmente */
+  margin: 0 auto; /* Centraliza horizontalmente dentro do contêiner pai */
+}
+
+/* Estilo específico para a página PokemonsList */
+.pokemonsListPage .imageContainer {
+  width: 200px;
+  height: 200px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Estilo geral para o contêiner de imagens */
+.imageContainer {
+  cursor: pointer;
+  position: relative;
+  width: auto;
+  height: 200px;
+  margin: 0 1px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    @import "../../app/variables.scss";
+
+    /* Contêiner pai com flexbox */
+    .list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; /* Centraliza o conteúdo verticalmente */
+      position: relative;
+      width: 100%;
+      height: 100vh; /* Garante que o contêiner ocupe toda a altura da viewport */
+      margin: auto;
+    }
+
+    /* Configuração do contêiner dos Pokémons */
+    .pokemons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+      gap: 0.5rem;
+      width: 100%;
+      height: 100%; /* Ocupe toda a altura da div pai */
+      margin: 0 auto; /* Centraliza horizontalmente dentro do contêiner pai */
+
+      justify-content: center; /* Centraliza os itens horizontalmente */
+      align-items: center; /* Centraliza os itens verticalmente */
+
+      /* Remova ou ajuste o max-width se você quiser que o conteúdo ocupe toda a largura */
+      max-width: none; /* Remove a limitação de largura máxima para ocupar toda a div */
+    }
+
+    /* Estilo específico para a página PokemonsList */
+    .pokemonsListPage .imageContainer {
+      width: 200px;
+      height: 200px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+      }
+    }
+
+    /* Estilo geral para o contêiner de imagens */
+    .imageContainer {
+      cursor: pointer;
+      position: relative;
+      width: auto;
+      height: 200px;
+      margin: 0 1px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+      }
+    }
+
+    /* Estilo do título */
+    .title {
+      font-size: 26vw;
+      margin: 0;
+
+      @media screen and (min-width: $max-width) {
+        font-size: 30rem;
+      }
+    }
+
+    .pageInfo {
+      margin: 0 10px;
+      font-size: 16px;
+    }
+
+    .arrow {
+      font-size: 24px;
+      color: #0070f3;
+      cursor: pointer;
+    }
+
+    object-position: center;
+  }
+}
+
+/* Estilo do título */
+.title {
+  font-size: 26vw;
+  margin: 0;
+
+  @media screen and (min-width: $max-width) {
+    font-size: 30rem;
+  }
+}
+
+.pageInfo {
+  margin: 0 10px;
+  font-size: 16px;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #0070f3;
+  cursor: pointer;
+}

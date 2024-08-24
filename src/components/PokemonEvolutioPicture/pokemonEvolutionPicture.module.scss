@@ -1,0 +1,64 @@
+@import "../../app/variables.scss";
+
+.imageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin: auto;
+
+  &.mainPageSize {
+    width: 85px !important;
+    height: 85px !important;
+  }
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.pokemonNumber,
+.pokemonName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.pokemonName {
+  font-size: 1.3rem;
+}
+
+.pokemonNumber {
+  color: rgb(67, 36, 245);
+}
+
+.pokemonTypes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.type {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 4px;
+  color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 0 5px;
+}

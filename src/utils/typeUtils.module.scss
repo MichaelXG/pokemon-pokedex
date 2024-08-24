@@ -1,0 +1,100 @@
+/* Classe base para tipos de Pokémon */
+.typeBase {
+  height: min-content;
+  width: 100%;
+  max-width: 60px;
+  padding: 2px;
+  text-align: center;
+  color: white; /* Valor padrão */
+  border-radius: 0.5rem 2rem;
+  box-shadow: 0px 30px 40px -10px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s;
+  position: relative;
+  flex: 1 1 auto;
+}
+
+/* Container redondo para ícones de tipo */
+.typeContainer {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Mapeamento de estilos para tipos específicos */
+%typeBaseColor {
+  &.typeGrass {
+    background-color: #78c850;
+  }
+  &.typeFire {
+    background-color: #f08030;
+  }
+  &.typeWater {
+    background-color: #6890f0;
+  }
+  &.typeElectric {
+    background-color: #f8d030;
+    color: black;
+  }
+  &.typePsychic {
+    background-color: #f85888;
+  }
+  &.typeBug {
+    background-color: #a8b820;
+  }
+  &.typeFlying {
+    background-color: #a890f0;
+  }
+  &.typeNormal {
+    background-color: #a8a878;
+    color: black;
+  }
+  &.typePoison {
+    background-color: #a040a0;
+  }
+  &.typeGround {
+    background-color: #e0c068;
+    color: black;
+  }
+  &.typeRock {
+    background-color: #b8a038;
+  }
+  &.typeSteel {
+    background-color: #b8b8d0;
+    color: black;
+  }
+  &.typeIce {
+    background-color: #98d8d8;
+    color: black;
+  }
+  &.typeDragon {
+    background-color: #7038f8;
+  }
+  &.typeDark {
+    background-color: #705848;
+  }
+  &.typeFairy {
+    background-color: #ee99ac;
+    color: black;
+  }
+  &.typeFighting {
+    background-color: #c03028;
+  }
+  &.typeShadow {
+    background-color: #6b6b6b;
+  }
+  &.typeUnknown {
+    background-color: #9e9e9e;
+    color: black;
+  }
+  &.typeDefault {
+    background-color: #d3d3d3;
+    color: black;
+  }
+}
+
+.typeBase {
+  @extend %typeBaseColor;
+}

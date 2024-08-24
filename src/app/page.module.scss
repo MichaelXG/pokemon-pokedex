@@ -1,0 +1,13 @@
+.main {
+  // Alinha os itens no centro do contêiner verticalmente
+  // align-items: center;
+
+  // Define o display como flex para aplicar o layout flexível
+  display: flex;
+
+  // Define a direção dos itens do flex container como coluna (ou seja, os itens serão empilhados verticalmente)
+  flex-direction: column;
+
+  // Define a posição do contêiner como relativa, permitindo que elementos filhos com posição absoluta sejam posicionados em relação a este contêiner
+  position: relative;
+}
