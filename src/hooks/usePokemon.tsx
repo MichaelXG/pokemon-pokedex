@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 
-import PokemonContext from "@/context/PokemonContext";
+import PokemonContext from "../context/pokemonContext";
 
 const usePokemon = () => {
   const context = useContext(PokemonContext);
