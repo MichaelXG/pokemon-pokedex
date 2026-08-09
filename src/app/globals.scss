@@ -7,9 +7,21 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 // Define estilos globais aplicáveis ao documento
 :root {
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   transition: background 1s ease-in-out;
   background-size: cover;
 
@@ -22,14 +34,7 @@
     width: 100%;
   }
 
-  // --sunglow: #ffc857;
-  // --murrey: #89023e;
-  // --green-yellow: #ccff66;
-  // --bittersweet: #ff6666;
   --light-sea-green: #2ec4b6;
-  // --violet-blue: #3b429f;
-  // --lavender: #aa7dce;
-  // --bg: #ececec;
 }
 
 // Mixin para o gradiente animado
@@ -55,77 +60,27 @@
 body {
   @include gradient-background;
   color: $text-color;
-  height: calc(100vh - 3.5rem);
-  margin: auto;
-  max-width: $max-width;
-  min-width: $min-width;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-width: 0;
   position: relative;
   z-index: 1;
-  height: 100%;
 }
 
-.grid {
+.app-shell {
   display: grid;
-  grid-template-rows: 5rem 1fr 3rem;
-  grid-template-columns: 5% auto 5%;
-  font-size: 1.1rem;
-  min-width: 100%;
-  min-height: 100%;
-}
-
-@media (max-width: $min-width) {
-  .grid {
-    grid-template-rows: 6rem 1fr 6rem;
-    grid-template-columns: 1fr;
-    min-width: 10%;
-    min-height: 10%;
-  }
-
-  main {
-    grid-column: 1 / -1;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-aside {
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-width: 0;
   width: 100%;
-
-  @media (max-width: $min-width) {
-    width: 100%;
-    height: 5px;
-  }
-}
-
-aside {
-  background-color: var(--green-yellow);
-}
-
-header,
-footer {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1rem 1rem 0;
-  position: relative;
-  z-index: 4;
-}
-
-aside,
-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100%;
-  min-width: 100%;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .top-bar,
@@ -133,12 +88,9 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 3rem;
   width: 100%;
   margin: 0;
-  margin-top: 1rem !important;
-  padding: 0;
-
+  padding: 0.75rem 1rem;
   z-index: 1;
 
   .css-6ipahu-MuiStack-root {
@@ -204,106 +156,29 @@ a:hover {
 
 // ------------------------------------------------------- //
 /* Layout principal: Carrossel e Detalhes */
-.grid-carousel-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 1fr;
-  height: 100%;
-  max-width: 1920px;
-  min-width: 350px;
-}
-
-/* Estilo para o Carrossel */
-.grid-carousel {
-  grid-column: 1;
-  grid-row: 1;
-  background: var(--light-sea-green);
-  z-index: 1;
-}
-
-/* Estilo para os Detalhes */
-.grid-details {
-  grid-column: 2;
-  display: grid;
-  z-index: 1;
-}
-
-.grid-details div:nth-child(1) {
-  grid-row: 1;
-  background: var(--bittersweet);
-}
-
-.grid-details div:nth-child(2) {
-  grid-row: 2;
-  background: var(--lavender);
-}
-
-.grid-details div:nth-child(3) {
-  grid-row: 3;
-  background: var(--sunglow);
-}
-
-.grid-details div:nth-child(4) {
-  grid-row: 4;
-  background: var(--green-yellow);
-}
-
-/* Responsividade para telas médias */
-@media (max-width: 768px) {
-  .grid-carousel-details {
-    grid-template-columns: 1fr;
-    // grid-template-rows: repeat(2, 1fr);
-  }
-
-  .grid-details {
-    grid-template-rows: repeat(1, 1fr);
-  }
-}
-
-/* Responsividade para telas pequenas */
-@media (max-width: 462px) {
-  .grid-details {
-    grid-template-columns: repeat(1, 1fr);
-    grid-template-rows: repeat(1, 1fr);
-  }
-
-  .grid-details div:nth-child(1) {
-    grid-column: 1 / 2;
-    grid-row: 1 / 3;
-  }
-
-  .grid-details div:nth-child(2) {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-  }
-
-  .grid-details div:nth-child(3) {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-  }
-
-  .grid-details div:nth-child(4) {
-    grid-column: 1 / 3;
-    grid-row: 3 / 4;
-  }
+.grid-carousel-details,
+.grid-carousel,
+.grid-details,
+.bottom-bar-2,
+.top-bar-2 {
+  background: transparent;
 }
 
 /* Barra superior */
 .top-bar-2 {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-template-rows: 1fr;
-  height: 100%;
-  max-width: 1920px;
-  min-width: 350px;
-  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 1360px;
+  min-width: 0;
+  margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
 }
 
 .top-bar-2 div:nth-child(1) {
   grid-row: 1;
-  background: var(--bittersweet);
+  background: transparent;
 }
 
 /* Barra inferior */
@@ -315,8 +190,8 @@ a:hover {
   width: 100%;
   padding: 1rem;
   box-sizing: border-box;
-  border-top: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  border: none;
+  background: transparent;
 }
 
 .detailsEvo {
@@ -331,14 +206,13 @@ a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; /* O contêiner ocupará 100% da largura do pai */
-  max-width: 500px; /* Define a largura máxima para o contêiner */
-  padding: 1rem; /* Adiciona um pouco de preenchimento */
-  box-sizing: border-box; /* Inclui o padding e a borda na largura e altura totais */
+  width: 100%;
+  max-width: 500px;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-/* Canvas dentro do contêiner */
 .chartContainer canvas {
-  width: 100% !important; /* O canvas ocupará a largura total do contêiner */
-  height: auto !important; /* A altura do canvas será ajustada automaticamente */
+  width: 100% !important;
+  height: auto !important;
 }

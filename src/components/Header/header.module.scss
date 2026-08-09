@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  padding: max(0.7rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    0.7rem max(1rem, env(safe-area-inset-left));
+  background: rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(220px, 80vw);
+}
+
+.logo {
+  width: auto;
+  max-width: 100%;
+  height: clamp(36px, 9vw, 52px);
+  object-fit: contain;
+}

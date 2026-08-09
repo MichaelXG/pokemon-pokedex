@@ -1,48 +1,60 @@
-"use client";
+import styles from "./pokemonStatsChart.module.scss";
+import { getTypeColor } from "@/utils/typeUtils";
+import { IStat } from "@/interfaces/IPokemon";
 
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-import styles from "../PokemonStatsChart/pokemonStatsChart.module.scss";
-
-// Importa os componentes necessários do Chart.js para configurar o gráfico
-
-// Registra os componentes necessários do Chart.js para o funcionamento do gráfico de barras
-ChartJS.register(
-  CategoryScale, // Escala para o eixo das categorias (x-axis)
-  LinearScale, // Escala para o eixo numérico (y-axis)
-  BarElement, // Elemento gráfico para barras
-  Title, // Título do gráfico
-  Tooltip, // Tooltip que aparece ao passar o mouse sobre as barras
-  Legend // Legenda do gráfico
-);
-
-interface PokemonStatsChartProps {
-  data: any; // Dados do gráfico (deve estar no formato aceito pelo Chart.js)
-  options: any; // Opções de configuração do gráfico (como estilo, layout, etc.)
-}
-
-// Componente funcional que renderiza um gráfico de barras usando react-chartjs-2
-const PokemonStatsChart: React.FC<PokemonStatsChartProps> = ({
-  data,
-  options,
-}) => {
-  return (
-    <>
-      {" "}
-      <div className={styles.barChartContainer}>
-        <Bar data={data} options={options} />
-      </div>
-    </>
-  );
+const LABELS: Record<string, string> = {
+  hp: "PS",
+  attack: "Ataque",
+  defense: "Defesa",
+  "special-attack": "At. Esp.",
+  "special-defense": "Def. Esp.",
+  speed: "Velocidade",
 };
 
-export default PokemonStatsChart; // Exporta o componente para ser utilizado em outros arquivos
+const SEGMENTS = 15;
+const MAX_STAT = 180;
+
+interface PokemonStatsChartProps {
+  stats: IStat[];
+  typeName: string;
+}
+
+function filledSegments(value: number) {
+  return Math.max(0, Math.min(SEGMENTS, Math.round((value / MAX_STAT) * SEGMENTS)));
+}
+
+export default function PokemonStatsChart({
+  stats,
+  typeName,
+}: PokemonStatsChartProps) {
+  const color = getTypeColor(typeName || "normal");
+
+  return (
+    <ul className={styles.stats}>
+      {stats.map((stat) => {
+        const filled = filledSegments(stat.base_stat);
+
+        return (
+          <li key={stat.stat.name} className={styles.stat}>
+            <span className={styles.label}>
+              {LABELS[stat.stat.name] || stat.stat.name}
+            </span>
+            <ul className={styles.gauge} aria-hidden>
+              {Array.from({ length: SEGMENTS }, (_, index) => {
+                const isOn = index >= SEGMENTS - filled;
+                return (
+                  <li
+                    key={index}
+                    className={isOn ? styles.on : undefined}
+                    style={isOn ? { backgroundColor: color, color } : undefined}
+                  />
+                );
+              })}
+            </ul>
+            <strong className={styles.value}>{stat.base_stat}</strong>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

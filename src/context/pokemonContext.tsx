@@ -1,101 +1,119 @@
 "use client";
 
-import React, { createContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from "react";
 
 import { IPokemon } from "@/interfaces/IPokemon";
-import { fetchAllPokedex } from "@/app/api/services";
-import { DEFAULT_LIMIT } from "@/utils/globalUtils";
+import { fetchPokemonPage } from "@/lib/pokemonClient";
+import { DEFAULT_LIMIT, MAX_PAGE_SIZE } from "@/utils/globalUtils";
 
-// Tipo do contexto
-interface IPokemonContext {
-  pokemonData: IPokemon[];
-  filteredPokemon: IPokemon[]; // Novo estado para armazenar os Pokémon filtrados
+export interface IPokemonContext {
+  paginatedPokemon: IPokemon[];
   loading: boolean;
   error: string | null;
-  paginatedPokemon: IPokemon[];
   currentPage: number;
   totalPages: number;
+  totalCount: number;
+  pageSize: number;
+  searchTerm: string;
   setPage: (page: number) => void;
-  setFilteredPokemon: (filtered: IPokemon[]) => void; // Função para definir os Pokémon filtrados
+  setPageSize: (size: number) => void;
+  setSearchTerm: (term: string) => void;
 }
 
-// Valor padrão do contexto
-const defaultContextValue: IPokemonContext = {
-  pokemonData: [],
-  filteredPokemon: [],
-  loading: false,
-  error: null,
-  paginatedPokemon: [],
-  currentPage: 1,
-  totalPages: 1,
-  setPage: () => {},
-  setFilteredPokemon: () => {},
-};
-
-// Criação do contexto
-const PokemonContext = createContext<IPokemonContext>(defaultContextValue);
+const PokemonContext = createContext<IPokemonContext | null>(null);
 
 export const PokemonProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [pokemonData, setPokemonData] = useState<IPokemon[]>([]);
-  const [filteredPokemon, setFilteredPokemon] = useState<IPokemon[]>([]); // Estado para Pokémon filtrados
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [paginatedPokemon, setPaginatedPokemon] = useState<IPokemon[]>([]);
-
-  const pokemonsPerPage = DEFAULT_LIMIT;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [pageSize, setPageSizeState] = useState(DEFAULT_LIMIT);
 
   useEffect(() => {
-    const loadAllPokemons = async () => {
-      console.log("Starting to fetch Pokémon data...");
-      setLoading(true);
+    const timer = setTimeout(() => {
+      if (searchTerm !== debouncedSearch) {
+        setDebouncedSearch(searchTerm);
+        setCurrentPage(1);
+      }
+    }, 300);
 
+    return () => clearTimeout(timer);
+  }, [searchTerm, debouncedSearch]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPage = async () => {
+      setLoading(true);
       try {
-        const allPokemons = await fetchAllPokedex();
-        console.log("Successfully fetched Pokémon data:", allPokemons);
-        setPokemonData(allPokemons);
-        setFilteredPokemon(allPokemons); // Inicialmente, os Pokémon filtrados são todos
+        const data = await fetchPokemonPage(
+          currentPage,
+          pageSize,
+          debouncedSearch
+        );
+        if (cancelled) return;
+        setPaginatedPokemon(data.results);
+        setTotalPages(data.totalPages);
+        setTotalCount(data.count);
         setError(null);
-      } catch (err) {
-        console.error("Error fetching Pokémon data:", err);
+      } catch {
+        if (cancelled) return;
         setError("Failed to fetch Pokémon data.");
+        setPaginatedPokemon([]);
       } finally {
-        setLoading(false);
-        console.log("Finished fetching Pokémon data.");
+        if (!cancelled) setLoading(false);
       }
     };
 
-    loadAllPokemons();
+    void loadPage();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPage, debouncedSearch, pageSize]);
+
+  const setPage = useCallback(
+    (page: number) => {
+      if (page < 1 || page > totalPages) return;
+      setCurrentPage(page);
+    },
+    [totalPages]
+  );
+
+  const setPageSize = useCallback((nextSize: number) => {
+    const next = Math.max(1, Math.min(MAX_PAGE_SIZE, Math.round(nextSize)));
+    setPageSizeState((prev) => {
+      if (prev === next) return prev;
+      setCurrentPage((page) => Math.floor(((page - 1) * prev) / next) + 1);
+      return next;
+    });
   }, []);
-
-  useEffect(() => {
-    const start = (currentPage - 1) * pokemonsPerPage;
-    const end = start + pokemonsPerPage;
-    setPaginatedPokemon(filteredPokemon.slice(start, end)); // Pagina os Pokémon filtrados
-  }, [filteredPokemon, currentPage, pokemonsPerPage]);
-
-  const totalPages = Math.ceil(filteredPokemon.length / pokemonsPerPage); // Total de páginas baseado nos Pokémon filtrados
-
-  const setPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
 
   return (
     <PokemonContext.Provider
       value={{
-        pokemonData,
-        filteredPokemon,
+        paginatedPokemon,
         loading,
         error,
-        paginatedPokemon,
         currentPage,
         totalPages,
+        totalCount,
+        pageSize,
+        searchTerm,
         setPage,
-        setFilteredPokemon, // Passa a função para definir Pokémon filtrados
+        setPageSize,
+        setSearchTerm,
       }}
     >
       {children}

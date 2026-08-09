@@ -1,88 +1,92 @@
-# Projeto Pokémon
+# Pokémon Pokédex
 
-Este é o repositório do projeto Pokémon, desenvolvido durante um super module de React JS. O projeto consiste em uma aplicação interativa inspirada na (https://pokeapi.co/), usando as principais stacks front-end: React, Next.js 13, a biblioteca Framer Motion, Sass e TypeScript para criar um projeto visual incrível e de alta performance.
+Pokédex interativa do Super Módulo de React JS. Consome a [PokéAPI](https://pokeapi.co/) via Route Handlers do Next.js e apresenta a National Dex com busca, paginação responsiva e uma página de detalhe com carrossel, estatísticas, fraquezas, gênero e cadeia evolutiva (incluindo Mega Evoluções).
 
-<!-- [Demonstração do projeto.webm] -->
+Repositório: [github.com/MichaelXG/pokemon-pokedex](https://github.com/MichaelXG/pokemon-pokedex)
 
-## 💻 Tecnologias utilizadas no projeto
+## Funcionalidades
 
-- [React.js](https://reactjs.org) (v18)
-- [Next.js](https://nextjs.org) (v13)
-- [TypeScript](https://www.typescriptlang.org) (v5)
-- [ESLint](https://eslint.org)
-- [Framer Motion](https://www.framer.com/api/motion)
-- [SASS](https://sass-lang.com)
+- **Lista da Dex** — cards com artwork oficial, número e tipos (ícones)
+- **Busca** — filtro por nome ou número, com feedback quando não há resultado
+- **Paginação automática** — a quantidade de cards por página se ajusta à largura da tela (`ResizeObserver`)
+- **Detalhe em carrossel** — navega entre Pokémon com teclado (← →) ou swipe; sem setas visíveis
+- **Sobre** — tipos, altura, peso, habilidades e distribuição de gênero
+- **Fraquezas** — calculadas a partir das relações de dano da PokéAPI (tipos duplos incluídos)
+- **Status** — barras segmentadas no estilo Pokémon (PS, Ataque, Defesa, At. Esp., Def. Esp., Velocidade)
+- **Evoluções** — cadeia completa em uma linha, com Mega Evoluções quando existirem
+- **Áudio** — clips locais em `/public/songs` quando disponíveis; caso contrário, fala o nome com `speechSynthesis`
 
-## 🌿 Branches
+## Stack
 
-- `main` projeto finalizado com todas as features implementadas;.
+| Área | Tecnologia |
+| --- | --- |
+| UI | React 18 + Next.js 13 (App Router) |
+| Linguagem | TypeScript 5 |
+| Estilo | Sass (CSS Modules) + Framer Motion |
+| Dados | PokéAPI (`pokeapi.co/api/v2`) |
+| Testes | Vitest |
+| Qualidade | ESLint + Prettier |
 
-## 🗄️ Estrutura de pastas
+## Rotas
 
-O projeto está estruturado da seguinte forma:
+| Rota | Descrição |
+| --- | --- |
+| `/` | Home — busca, grade e paginação |
+| `/pokemon/[id]` | Detalhe do Pokémon |
+| `/api/pokemon` | Lista paginada (`page`, `limit`, `q`) |
+| `/api/pokemon/[id]` | Detalhe mapeado (stats, tipos, gênero, fraquezas…) |
+| `/api/pokemon/[id]/evolutions` | Cadeia evolutiva + Megas |
+| `/api/pokemon/meta` | Metadados da Dex (total de IDs) |
 
-- 📁 `public`
-  - 📁 `icons`
-  - 📁 `pokemon`
-  - 📁 `songs`
-- 📁 `src`
-  - 📁 `app`
-    - 📁 `api`
-    - 📁 `Pokemon`
-      - 📁 `[id]`
-  - 📁 `components`
-    - 📁 `Carousel`
-    - 📁 `PokemonDetails`
-    - 📁 `PokemonList`
-    - 📁 `PokemonPicture`
-    - 📁 `PokemonStatsChart`
-  - 📁 `fonts`
-  - 📁 `interfaces`
+As respostas da API são revalidadas em cache por 24h.
 
-## 🛠️ Instruções de execução
+## Estrutura
 
-Siga as instruções abaixo para rodar o projeto em seu ambiente local:
-
-1. Certifique-se de ter o Node.js instalado em seu computador. Você pode baixar a versão mais recente do Node.js em https://nodejs.org.
-
-2. Clone este repositório em seu computador ou faça o download do código fonte.
-
-3. Abra o terminal e navegue até o diretório raiz do projeto.
-
-4. Instale as dependências do projeto executando o seguinte comando:
-
-```bash
-  yarn install
+```
+pokemon-pokedex/
+├── public/                 # favicon, logo, ícones de tipos, clips de áudio
+├── src/
+│   ├── app/                # layout, home, detalhe e Route Handlers
+│   ├── components/         # cards, busca, carrossel, evoluções, stats, áudio
+│   ├── context/            # estado de paginação e busca
+│   ├── hooks/              # usePokemon, useFitPageSize
+│   ├── lib/                # cliente PokéAPI, fraquezas, gênero, testes
+│   ├── interfaces/         # tipos TypeScript do domínio
+│   └── utils/              # formatação de nome/id e labels de tipos
+└── vitest.config.ts
 ```
 
-5. Após a conclusão da instalação das dependências, inicie o servidor de desenvolvimento local com o comando:
+## Como executar
+
+Requisito: [Node.js](https://nodejs.org/) 18 ou superior.
 
 ```bash
-  yarn dev
+git clone https://github.com/MichaelXG/pokemon-pokedex.git
+cd pokemon-pokedex
+npm install
+npm run dev
 ```
 
-6. O servidor local será iniciado e você poderá acessar o projeto no seu navegador através do seguinte endereço:
+Abra [http://localhost:3000](http://localhost:3000). Se a porta 3000 estiver ocupada, o Next.js sobe na próxima porta livre.
 
-```bash
-  http://localhost:3000
-```
+### Scripts
 
-Caso a porta 3000 estiver em uso, automaticamente o Next.js irá subir na próxima porta livre da máquina.
+| Comando | O que faz |
+| --- | --- |
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm start` | Sobe o build (`next start`) |
+| `npm run lint` | ESLint |
+| `npm test` | Testes unitários (Vitest) |
 
-Se deseja alterar a porta padrão na qual a aplicação tentará subir, você pode modificar a porta no arquivo `next.config.js`.
+Os testes cobrem cálculo de fraquezas, distribuição de gênero e o ajuste de cards por linha.
 
-Agora você está pronto para explorar o projeto em seu ambiente local!
+## Observações
 
-## 👩‍💻 Autor
+- A PokéAPI não disponibiliza vozes falando o nome do Pokémon. Os cries oficiais são bipes de jogo; por isso o áudio usa MP3s locais e, na falta deles, síntese de fala no navegador.
+- Mega Evoluções vêm de `species.varieties` (nomes com `-mega`), não do ID da forma na Dex.
+- Interface em português (`pt-BR`).
 
-<p>
-    <img align=left margin=10 width=80 src="https://avatars.githubusercontent.com/MichaelXG?v=4"/>
-    <p>&nbsp&nbsp&nbspMichael Xavier Gomes<br>
-    &nbsp&nbsp&nbsp<a href="https://www.instagram.com/michaelxg/">Instagram</a>&nbsp;|&nbsp;<a href="https://github.com/MichaelXG">GitHub</a>&nbsp;|&nbsp;<a href="https://www.linkedin.com/in/michael-xg/">LinkedIn</a>&nbsp;</p>
-</p>
-<br/><br/>
-<p>
+## Autor
 
----
-
-⌨️ por [Michael Xaier Gomes](https://github.com/MichaelXG) 😊
+[Michael Xavier Gomes](https://github.com/MichaelXG)

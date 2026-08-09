@@ -25,18 +25,11 @@ export interface IType {
 }
 
 export interface ISprite {
-  front_default: string; // URL da imagem padrão da frente.
+  front_default: string;
   other?: {
     "official-artwork"?: {
-      front_default?: string; // URL da imagem oficial de arte.
+      front_default?: string;
     };
-  };
-}
-
-export interface ILocationArea {
-  location_area: {
-    name: string;
-    url: string;
   };
 }
 
@@ -63,8 +56,7 @@ export interface IPokemonEvolution {
   name: string;
   image: string;
   types: IType[];
-  type_evol: string[];
-  evolutions?: IPokemonEvolution[];
+  type_evol: IPokemonEvolution[];
 }
 
 export interface IPokemon {
@@ -74,7 +66,6 @@ export interface IPokemon {
   weight: number;
   abilities: IAbility[];
   types: IType[];
-  location_areas: ILocationArea[];
   stats: IStat[];
   sprites: ISprite;
   species: ISpecies;
@@ -85,11 +76,5 @@ export interface IPokemon {
   };
   category: string;
   weaknesses: string[];
-}
-
-export interface IPokemonListResponse {
-  count: number;
-  results: IPokemon[];
-  next?: string; // URL para a próxima página de resultados
-  previous?: string; // URL para a página anterior de resultados
+  cry?: string;
 }

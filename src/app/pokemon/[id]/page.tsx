@@ -1,17 +1,24 @@
-"use client";
+import type { Metadata } from "next";
 
 import Carousel from "@/components/PokemonCarouselDetails";
-import Loader from "@/app/Loader";
-import usePokemon from "@/hooks/usePokemon";
+import { formatId } from "@/utils/globalUtils";
 
-export default function PokemonPage({ params }: { params: { id: number } }) {
-  const { pokemonData, loading, error } = usePokemon();
-  const activeId = Number(params.id); // Converta o activeId para um número
+type PokemonPageProps = {
+  params: { id: string };
+};
 
-  if (loading) {
-    return <Loader />;
+export function generateMetadata({ params }: PokemonPageProps): Metadata {
+  return {
+    title: `Pokémon N-${formatId(Number(params.id))}`,
+  };
+}
+
+export default function PokemonPage({ params }: PokemonPageProps) {
+  const activeId = Number(params.id);
+
+  if (!Number.isFinite(activeId) || activeId < 1) {
+    return <div>Pokémon não encontrado.</div>;
   }
-  if (error) return <div>{error}</div>;
 
-  return <Carousel activeId={activeId} pokemons={pokemonData} />;
+  return <Carousel activeId={activeId} />;
 }

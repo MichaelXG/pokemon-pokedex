@@ -1,0 +1,122 @@
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.group,
+.pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.55rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+  }
+}
+
+.navButton {
+  width: 38px;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.active {
+  background: linear-gradient(180deg, #ff5a3c 0%, #e3350d 100%);
+  box-shadow: 0 6px 14px rgba(227, 53, 13, 0.32);
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: linear-gradient(180deg, #ff6d52 0%, #ef3c16 100%);
+  }
+}
+
+.ellipsis {
+  min-width: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.icon {
+  display: block;
+}
+
+.flip {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 560px) {
+  .nav {
+    gap: 0.3rem;
+    padding: 0.32rem;
+    border-radius: 1.15rem;
+  }
+
+  .button {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 0.4rem;
+    font-size: 0.84rem;
+  }
+
+  .navButton {
+    width: 34px;
+  }
+
+  .group:first-of-type .navButton:first-child,
+  .group:last-of-type .navButton:last-child {
+    display: none;
+  }
+}

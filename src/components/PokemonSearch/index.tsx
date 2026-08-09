@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent, useRef } from "react";
-import Script from "next/script";
 
 import styles from "./pokemonSearch.module.scss";
 
@@ -14,7 +13,6 @@ const PokemonSearch: React.FC<PokemonSearchProps> = ({
   hasNoResults,
   onSearch,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,82 +21,73 @@ const PokemonSearch: React.FC<PokemonSearchProps> = ({
   }, [searchTerm, onSearch]);
 
   useEffect(() => {
-    if (isExpanded && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isExpanded]);
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "/" && event.target instanceof HTMLElement) {
+        if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+          return;
+        }
+        event.preventDefault();
+        inputRef.current?.focus();
+      }
 
-  useEffect(() => {
-    const handleEscKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (event.key === "Escape") {
         setSearchTerm("");
+        inputRef.current?.blur();
       }
     };
 
-    if (isExpanded) {
-      document.addEventListener("keydown", handleEscKeyPress);
-    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, []);
 
-    return () => {
-      document.removeEventListener("keydown", handleEscKeyPress);
-    };
-  }, [isExpanded]);
-
-  const handleExpandClick = () => setIsExpanded(true);
-
-  const handleCloseClick = () => {
-    setIsExpanded(false);
-    setSearchTerm("");
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
 
   return (
-    <>
-      <Script
-        src="https://cdn.lordicon.com/lordicon.js"
-        strategy="lazyOnload"
-      />
-      <div className={styles.container}>
-        {isExpanded ? (
-          <div className={styles.searchExpanded}>
-            <input
-              type="text"
-              ref={inputRef}
-              className={`${styles.searchInput} ${
-                hasNoResults ? styles.error : ""
-              }`}
-              placeholder="Search Pokémon by ID, name or type"
-              value={searchTerm}
-              onChange={handleInputChange}
-            />
-            <lord-icon
-              src="https://cdn.lordicon.com/pagmnkiz.json"
-              trigger="click"
-              stroke="bold"
-              state="morph-cross-reverse"
-              colors="primary:#ffffff,secondary:#b4b4b4"
-              style={{ width: "30px", height: "30px" }}
-              onClick={handleCloseClick}
-              className={styles.iconeFechar}
-            />
-          </div>
-        ) : (
-          <lord-icon
-            src="https://cdn.lordicon.com/pagmnkiz.json"
-            trigger="morph"
-            stroke="bold"
-            state="loop-spin"
-            colors="primary:#ffffff,secondary:#b4b4b4"
-            style={{ width: "30px", height: "30px" }}
-            onClick={handleExpandClick}
-            className={styles.iconeBusca}
+    <div className={styles.container}>
+      <label className={styles.label} htmlFor="pokemon-search">
+        Buscar Pokémon
+      </label>
+      <div className={`${styles.field} ${hasNoResults ? styles.error : ""}`}>
+        <svg
+          className={styles.icon}
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+          <path
+            d="M20 20L16.5 16.5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
-        )}
+        </svg>
+        <input
+          id="pokemon-search"
+          type="search"
+          ref={inputRef}
+          className={styles.searchInput}
+          placeholder="Buscar por nome, número ou tipo"
+          value={searchTerm}
+          onChange={handleInputChange}
+          autoComplete="off"
+        />
+        {searchTerm ? (
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={() => setSearchTerm("")}
+            aria-label="Limpar busca"
+          >
+            ×
+          </button>
+        ) : null}
       </div>
-    </>
+    </div>
   );
 };
 

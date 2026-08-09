@@ -1,93 +1,59 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 
-import { pokemonFont } from "@/fonts";
-import { formatId, formatName, LOGGING_ENABLED } from "@/utils/globalUtils";
+import TypeIcon from "@/components/TypeIcon";
+import { formatId, formatName } from "@/utils/globalUtils";
+import { getTypeColor } from "@/utils/typeUtils";
 import styles from "@/components/PokemonEvolutioPicture/pokemonEvolutionPicture.module.scss";
 import { IPokemonEvolution } from "@/interfaces/IPokemon";
-import { getTypeBackgroundUrl } from "@/utils/typeUtils";
 
 interface PokemonEvolutionPictureProps {
-  pokemonsEvo: IPokemonEvolution[]; // Lista de Pokémon a serem exibidos
-  isMainPage: boolean;
+  pokemon: IPokemonEvolution;
 }
 
 export default function PokemonEvolutionPicture({
-  pokemonsEvo,
-  isMainPage,
+  pokemon,
 }: PokemonEvolutionPictureProps) {
-  if (LOGGING_ENABLED) {
-    console.log(
-      "pokemonsEvo sprites:",
-      pokemonsEvo.map((pokemonEvo) => pokemonEvo.image)
-    );
-  }
-
-  // Define o tamanho da imagem com base na página (principal ou detalhe)
-  const sizeClass = isMainPage ? styles.mainPageSize : "";
+  const artwork = pokemon.image || "/pokemon-logo.svg";
+  const primaryType = pokemon.types[0]?.type.name || "normal";
 
   return (
-    <div className={styles.container}>
-      {pokemonsEvo.map((pokemonEvo) => {
-        const frontDefault = pokemonEvo.image || "/default-image.png";
-
-        return (
-          <div
-            key={pokemonEvo.id}
-            className={`${styles.imageContainer} ${sizeClass}`}
-          >
-            <Image
-              src={frontDefault}
-              alt={pokemonEvo.name || "Pokémon"}
-              layout="responsive" // Layout responsivo
-              width={200} // Ajuste o tamanho conforme necessário
-              height={200} // Ajuste o tamanho conforme necessário
-              quality={80} // Ajuste a qualidade conforme necessário
-              onError={(e) => {
-                if (LOGGING_ENABLED) {
-                  console.log("Error loading image:", e);
-                }
-              }}
-              // className={`${imageClass}`} // Aplica a classe especial se o Pokémon foi clicado
-            />
-
-            <div className={styles.infoContainer}>
-              <p className={`${styles.pokemonNumber} ${pokemonFont.className}`}>
-                N-{formatId(pokemonEvo.id)}
-              </p>
-              <p className={`${styles.pokemonName} ${pokemonFont.className}`}>
-                {formatName(pokemonEvo.name)}
-              </p>
-              <div className={styles.pokemonTypes}>
-                {pokemonEvo.types && pokemonEvo.types.length > 0 ? (
-                  // Mapeia e exibe os tipos do Pokémon
-                  pokemonEvo.types.map((type, index) => {
-                    const typeName = type.type.name;
-                    const backgroundUrl = getTypeBackgroundUrl(typeName);
-                    return (
-                      <span
-                        key={index}
-                        title={typeName}
-                        // className={styles.type}
-                        style={{
-                          backgroundImage: `url(${backgroundUrl})`,
-                          backgroundSize: "contain",
-                          backgroundRepeat: "no-repeat",
-                          width: "24px", // Ajuste o tamanho conforme necessário
-                          height: "24px", // Ajuste o tamanho conforme necessário
-                          display: "inline-block",
-                          margin: "0 5px",
-                        }}
-                      />
-                    );
-                  })
-                ) : (
-                  <span className={styles.type}>Not available</span>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+    <div
+      className={styles.card}
+      style={{ "--type-color": getTypeColor(primaryType) } as CSSProperties}
+    >
+      <div className={styles.hero}>
+        <span className={styles.number}>#{formatId(pokemon.id)}</span>
+        <div className={styles.artwork}>
+          <Image
+            src={artwork}
+            alt={formatName(pokemon.name)}
+            width={180}
+            height={180}
+            quality={80}
+            className={styles.image}
+          />
+        </div>
+      </div>
+      <div className={styles.body}>
+        <h3 className={styles.name}>{formatName(pokemon.name)}</h3>
+        <div className={styles.types}>
+          {pokemon.types?.length > 0 ? (
+            pokemon.types.map((type) => (
+              <span
+                key={type.type.name}
+                className={styles.typeIcon}
+                style={{ backgroundColor: getTypeColor(type.type.name) }}
+                title={formatName(type.type.name)}
+              >
+                <TypeIcon typeName={type.type.name} size={22} />
+              </span>
+            ))
+          ) : (
+            <span className={styles.empty}>—</span>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

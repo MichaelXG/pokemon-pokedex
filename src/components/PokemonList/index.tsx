@@ -1,121 +1,99 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
-import PokemonPicture from "../PokemonPicture";
+import PokemonCard, { PokemonCardSkeleton } from "../PokemonCard";
 import PokemonSearch from "../PokemonSearch";
 import PokemonPagination from "../PokemonPagination/pokemonPagination";
 
 import styles from "./pokemonList.module.scss";
 
+import useFitPageSize from "@/hooks/useFitPageSize";
 import usePokemon from "@/hooks/usePokemon";
-import Loader from "@/app/Loader";
 
 export default function PokemonList() {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const fittedSize = useFitPageSize(pageRef);
   const {
     paginatedPokemon,
     currentPage,
     totalPages,
+    pageSize,
     setPage,
+    setPageSize,
     loading,
-    setFilteredPokemon,
-    pokemonData,
+    error,
+    searchTerm,
+    setSearchTerm,
   } = usePokemon();
 
-  const [activeId, setActiveId] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const getPokemonIdFromUrl = useCallback(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idParam = urlParams.get("pokemonId");
-    if (idParam && !isNaN(Number(idParam))) {
-      return parseInt(idParam, 10);
-    }
-    return null;
-  }, []);
+  const hasNoResults =
+    !loading && paginatedPokemon.length === 0 && searchTerm !== "";
 
   useEffect(() => {
-    const idFromUrl = getPokemonIdFromUrl();
-    if (idFromUrl !== null) {
-      setActiveId(idFromUrl);
-    }
-  }, [getPokemonIdFromUrl]);
+    setPageSize(fittedSize);
+  }, [fittedSize, setPageSize]);
 
   useEffect(() => {
-    const searchLower = searchTerm.toLowerCase();
-
-    const filteredPokemons = pokemonData.filter((pokemon) => {
-      const idMatch =
-        !isNaN(Number(searchTerm)) && pokemon.id === Number(searchTerm);
-      const nameMatch = pokemon.name.toLowerCase().includes(searchLower);
-      const typeMatch = pokemon.types.some((type) =>
-        type.type.name.toLowerCase().includes(searchLower)
-      );
-
-      if (!isNaN(Number(searchTerm)) && searchTerm !== "") {
-        return idMatch;
-      }
-
-      return nameMatch || typeMatch;
-    });
-
-    setFilteredPokemon(filteredPokemons);
-  }, [searchTerm, pokemonData, setFilteredPokemon]);
-
-  if (loading) {
-    return <Loader />;
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   return (
-    <>
-      <div className="top-bar">
-        <PokemonSearch
-          onSearch={(term) => setSearchTerm(term)}
-          hasNoResults={paginatedPokemon.length === 0 && searchTerm !== ""}
-        />
+    <div ref={pageRef} className={styles.page}>
+      <div className={styles.toolbar}>
+        <PokemonSearch onSearch={setSearchTerm} hasNoResults={hasNoResults} />
       </div>
 
-      <div className={`content ${styles.pokemons}`}>
+      {error ? <p className={styles.error}>{error}</p> : null}
+
+      {hasNoResults ? (
+        <div className={styles.empty}>
+          <p className={styles.emptyTitle}>Nenhum Pokémon encontrado</p>
+          <p className={styles.emptyText}>
+            Tente outro nome, número da Pokédex ou tipo, como fire, water ou
+            grass.
+          </p>
+        </div>
+      ) : (
         <motion.section
-          className={styles.pokemons}
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
+          className={styles.grid}
+          style={{ ["--page-size" as string]: pageSize }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
         >
-          {paginatedPokemon.map((pokemon) => (
-            <motion.div
-              key={pokemon.id}
-              className={`${styles.imageContainer} ${styles[pokemon.id]} ${
-                activeId === pokemon.id ? styles.active : ""
-              }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setActiveId(pokemon.id)}
-            >
-              <Link href={`/pokemon/${pokemon.id}`}>
-                <PokemonPicture
-                  pokemon={pokemon}
-                  isMainPage={true}
-                  clickedId={activeId ?? 0}
-                />
-              </Link>
-            </motion.div>
-          ))}
+          {loading
+            ? Array.from({ length: pageSize }, (_, index) => (
+                <div key={index} className={styles.cell}>
+                  <PokemonCardSkeleton />
+                </div>
+              ))
+            : paginatedPokemon.map((pokemon, index) => (
+                <motion.div
+                  key={pokemon.id}
+                  className={styles.cell}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: index * 0.03 }}
+                >
+                  <PokemonCard pokemon={pokemon} />
+                </motion.div>
+              ))}
         </motion.section>
-      </div>
+      )}
 
-      <div className="bottom-bar">
-        <PokemonPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          showFirstLastButtons={true}
-          hidePrevNextButtons={false}
-        />
-      </div>
-    </>
+      {!hasNoResults && totalPages > 1 ? (
+        <div className={styles.pagination}>
+          <PokemonPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            showFirstLastButtons={true}
+            hidePrevNextButtons={false}
+          />
+        </div>
+      ) : null}
+    </div>
   );
 }

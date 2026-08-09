@@ -2,587 +2,427 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Quicksand } from "next/font/google";
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 import styles from "../PokemonCarouselDetails/pokemonCarouselDetails.module.scss";
-import { playAudio, playTransitionAudio } from "../PokemonAudio/pokemonAudio";
+import { playAudio } from "../PokemonAudio/pokemonAudio";
 import PokemonEvolutionList from "../PokemonEvolutionList";
-import PokemonStatsChart from "../PokemonStatsChart";
 import PokemonPicture from "../PokemonPicture";
+import PokemonStatsChart from "../PokemonStatsChart";
+import TypeIcon from "../TypeIcon";
 
-import {
-  FEMALE_IMAGE,
-  formatName,
-  LOGGING_ENABLED,
-  MALE_IMAGE,
-} from "@/utils/globalUtils";
+import { formatId, formatName } from "@/utils/globalUtils";
+import { getTypeColor } from "@/utils/typeUtils";
 import { IPokemon } from "@/interfaces/IPokemon";
-import { pokemonFont } from "@/fonts";
-import { formatId } from "@/utils/globalUtils";
-import { getTypeBackgroundUrl } from "@/utils/typeUtils";
+import { fetchDexMeta, fetchPokemonById } from "@/lib/pokemonClient";
+import Loader from "@/app/Loader";
 
-const quicksand = Quicksand({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-});
-
-// Enum para posições do carrossel
-enum enPosition {
-  FRONT = 1,
-  MIDDLE = 0,
-  BACK = 2,
-}
-
-// Props interface for the Carousel component
 interface IProps {
   activeId: number;
-  pokemons: IPokemon[];
 }
 
-// Carousel component
-export default function Carousel({ activeId, pokemons }: IProps) {
-  if (LOGGING_ENABLED) {
-    console.log("Active ID:", activeId);
-  }
+function wrapId(id: number, maxId: number) {
+  if (maxId < 1) return 1;
+  if (id > maxId) return id;
+  if (id < 1) return maxId;
+  return id;
+}
 
-  const [visibleItems, setVisibleItems] = useState<IPokemon[]>([]);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [startInteractionPosition, setStartInteractionPosition] =
-    useState<number>(0);
+function prettyName(value: string) {
+  return value.replace(/-/g, " ");
+}
 
-  const [typeImagesExist, setTypeImagesExist] = useState<
-    Record<string, boolean>
-  >({});
-  const [weaknessImagesExist, setWeaknessImagesExist] = useState<
-    Record<string, boolean>
-  >({});
-
-  useEffect(() => {
-    if (pokemons.length > 0 && activeIndex !== null) {
-      const currentPokemon = pokemons[activeIndex];
-      if (currentPokemon) {
-        <Link href={`/pokemon/${currentPokemon}`} />;
-      }
-    }
-  }, [activeIndex, pokemons]);
-
-  // Effect to initialize the active index and start interaction position
-  useEffect(() => {
-    if (pokemons.length > 0) {
-      const index = pokemons.findIndex((pokemon) => pokemon.id === activeId);
-
-      if (index !== -1) {
-        setActiveIndex(index);
-        setStartInteractionPosition(index * 300);
-      } else {
-        setActiveIndex(0);
-        setStartInteractionPosition(0);
-      }
-
-      if (LOGGING_ENABLED) {
-        console.log("Active Pokémon index:", index);
-        console.log(
-          "Start interaction position set to:",
-          startInteractionPosition
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pokemons, activeId]); // Nâo colocar o startInteractionPosition aqui
-
-  // Effect to update visible items based on the active index
-  useEffect(() => {
-    if (pokemons.length > 0) {
-      const indexInArrayScope =
-        ((activeIndex % pokemons.length) + pokemons.length) % pokemons.length;
-      const newVisibleItems = [...pokemons, ...pokemons].slice(
-        indexInArrayScope,
-        indexInArrayScope + 3
-      );
-      setVisibleItems(newVisibleItems);
-
-      if (LOGGING_ENABLED) {
-        console.log("Visible items:", newVisibleItems);
-      }
-    }
-  }, [pokemons, activeIndex]);
-
-  // Effect to add a class to the HTML element for styling
-  useEffect(() => {
-    const htmlEl = document.querySelector("html");
-    if (htmlEl) {
-      htmlEl.classList.add("pokemon-page");
-
-      return () => {
-        htmlEl.classList.remove("pokemon-page");
-      };
-    }
-  }, []);
-
-  // Effect to play audio when visible items change
-  useEffect(() => {
-    if (visibleItems.length > 0) {
-      const middlePokemon = visibleItems[enPosition.MIDDLE];
-
-      if (middlePokemon && middlePokemon.id === pokemons[activeIndex].id) {
-        playTransitionAudio();
-        playAudio(middlePokemon.id);
-
-        if (LOGGING_ENABLED) {
-          console.log(
-            "Playing transition audio and voice for:",
-            middlePokemon.id
-          );
-        }
-      }
-
-      if (LOGGING_ENABLED) {
-        console.log("Current visible items:", visibleItems);
-      }
-    }
-  }, [visibleItems, activeIndex, pokemons]);
-
-  // Handler to change the active index based on direction
-  const handleChangeActiveIndex = (newDirection: number) => {
-    setActiveIndex((prevActiveIndex) => {
-      const newIndex =
-        (prevActiveIndex + newDirection + pokemons.length) % pokemons.length;
-      return newIndex;
-    });
-  };
-
-  // Handler for drag start event
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    setStartInteractionPosition(e.clientX);
-
-    if (LOGGING_ENABLED) {
-      console.log("Drag started at position:", e.clientX);
-    }
-  };
-
-  // Handler for drag end event
-  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    if (startInteractionPosition) {
-      rotateCarousel(e.clientX);
-
-      if (LOGGING_ENABLED) {
-        console.log("Drag ended at position:", e.clientX);
-      }
-    }
-  };
-
-  // Handler for touch start event
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    setStartInteractionPosition(e.touches[0].clientX);
-
-    if (LOGGING_ENABLED) {
-      console.log("Touch started at position:", e.touches[0].clientX);
-    }
-  };
-
-  // Handler for touch end event
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (startInteractionPosition) {
-      rotateCarousel(e.changedTouches[0].clientX);
-
-      if (LOGGING_ENABLED) {
-        console.log("Touch ended at position:", e.changedTouches[0].clientX);
-      }
-    }
-  };
-
-  // Function to rotate the carousel based on clientX position
-  const rotateCarousel = (clientX: number) => {
-    const diffPosition = clientX - startInteractionPosition;
-    const newPosition = diffPosition > 0 ? -1 : 1;
-    handleChangeActiveIndex(newPosition);
-
-    if (LOGGING_ENABLED) {
-      console.log("Rotated carousel by difference in position:", diffPosition);
-    }
-  };
-
-  // Display a message if no Pokémon data is available
-  if (visibleItems.length === 0) {
-    return <div>No Pokémon data available.</div>;
-  }
-
-  // Find the current Pokémon to display details
-  const currentPokemon = pokemons[activeIndex];
-
-  const statsData = {
-    labels: currentPokemon.stats.map((stat) => stat.stat.name),
-    datasets: [
-      {
-        label: "Stats",
-        data: currentPokemon.stats.map((stat) => stat.base_stat),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.5)",
-          "rgba(54, 162, 235, 0.5)",
-          "rgba(255, 206, 86, 0.5)",
-          "rgba(75, 192, 192, 0.5)",
-          "rgba(153, 102, 255, 0.5)",
-          "rgba(255, 159, 64, 0.5)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true, // Permite que o gráfico seja responsivo
-    maintainAspectRatio: false, // Permite que o gráfico se adapte ao tamanho do container
-    scales: {
-      x: {
-        beginAtZero: true,
-        ticks: {
-          font: {
-            size: 14,
-            weight: "bold",
-          },
-        },
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          font: {
-            size: 14,
-            weight: "bold",
-          },
-        },
-      },
-    },
-  };
-
-  const checkImages = async () => {
-    const typeChecks = await Promise.all(
-      currentPokemon.types.map(async (type) => {
-        const url = getTypeBackgroundUrl(type.type.name);
-        return {
-          [type.type.name]: await fetch(url).then((response) => response.ok),
-        };
-      })
-    );
-    setTypeImagesExist(Object.assign({}, ...typeChecks));
-
-    const weaknessChecks = await Promise.all(
-      currentPokemon.weaknesses.map(async (weakness) => {
-        const url = getTypeBackgroundUrl(weakness);
-        return {
-          [weakness]: await fetch(url).then((response) => response.ok),
-        };
-      })
-    );
-    setWeaknessImagesExist(Object.assign({}, ...weaknessChecks));
-  };
-
-  checkImages();
-
+function MaleIcon() {
   return (
-    <>
-      <div className="top-bar">
-        <div className={`${quicksand.className}`}>
-          <h1 className={`${pokemonFont.className} ${styles.title}`}>
-            {formatName(currentPokemon.name)} (N-{formatId(currentPokemon.id)})
-          </h1>
-        </div>
-      </div>
-
-      <div className={`content`}>
-        <div className="grid-carousel-details">
-          <div className="grid-carousel">
-            <div
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            >
-              <AnimatePresence mode="popLayout">
-                {visibleItems.map((item, position) =>
-                  item.id ? (
-                    <motion.div
-                      key={item.id}
-                      className={styles.pokemon}
-                      transition={{ duration: 0.8 }}
-                      initial={{
-                        x: -1500,
-                        scale: 0.75,
-                      }}
-                      animate={{ x: 0, ...getItemStyles(position) }}
-                      exit={{
-                        x: 0,
-                        left: "-20%",
-                        opacity: 0,
-                        scale: 1,
-                      }}
-                    >
-                      <Link href={`/pokemon/${item.id}`}>
-                        <PokemonPicture pokemon={item} isMainPage={false} />
-                      </Link>
-                    </motion.div>
-                  ) : null
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-          <div className="grid-details">
-            {/* Description */}
-            <div className={styles.details}>
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <td className={styles.subtitle}>Description</td>
-                    <td>{currentPokemon.description || "Not available"}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>{" "}
-            {/* Informations */}
-            <div className={styles.details}>
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <td className={styles.subtitle}>Height</td>
-                    <td>
-                      {currentPokemon.height
-                        ? `${(currentPokemon.height / 10).toFixed(2)} m`
-                        : "Not available"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.subtitle}>Weight</td>
-                    <td>
-                      {currentPokemon.weight
-                        ? `${(currentPokemon.weight / 10).toFixed(2)} kg`
-                        : "Not available"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.subtitle}>Category</td>
-                    {currentPokemon.category ? (
-                      <td
-                        title={currentPokemon.category}
-                        // className={styles.type}
-                        style={{
-                          backgroundImage: typeImagesExist[
-                            currentPokemon.category
-                          ]
-                            ? `url(${getTypeBackgroundUrl(
-                                currentPokemon.category
-                              )})`
-                            : "none",
-                          height: "35px",
-                          backgroundSize: "contain",
-                          backgroundRepeat: "no-repeat",
-                        }}
-                      >
-                        {!typeImagesExist[currentPokemon.category] && (
-                          <td>{currentPokemon.category}</td>
-                        )}
-                      </td>
-                    ) : (
-                      <td className={styles.label}>Not available</td>
-                    )}
-                  </tr>
-                  <tr>
-                    <td className={styles.subtitle}>Abilities</td>
-                    <td>
-                      {currentPokemon.abilities.length > 0
-                        ? currentPokemon.abilities
-                            .map((ability) => ability.ability.name)
-                            .join(", ")
-                        : "Not available"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.subtitle}>Gender</td>
-                    <td>
-                      <div className={styles.genderRates}>
-                        <div>
-                          <Image
-                            src={MALE_IMAGE}
-                            alt="Male Icon"
-                            width={85}
-                            height={85}
-                            // className={styles.maleIcon}
-                          />
-                          <td>
-                            {currentPokemon.gender?.male || "Not available"}
-                          </td>
-                        </div>
-                        <div>
-                          <Image
-                            src={FEMALE_IMAGE}
-                            alt="Female Icon"
-                            width={85}
-                            height={85}
-                            // className={`${styles.genderIcon} ${styles.femaleIcon}`}
-                          />
-                          <span>
-                            {currentPokemon.gender?.female || "Not available"}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            {/* Types */}
-            <div className={styles.details}>
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <td className={styles.subtitle}>Types</td>
-                    <td>
-                      <ul>
-                        {currentPokemon.types.length > 0 ? (
-                          currentPokemon.types.map((type, index) => {
-                            const typeName = type.type.name;
-                            const backgroundUrl =
-                              getTypeBackgroundUrl(typeName);
-                            return (
-                              <td
-                                key={index}
-                                title={typeName}
-                                className={styles.type}
-                                style={{
-                                  backgroundImage: typeImagesExist[typeName]
-                                    ? `url(${backgroundUrl})`
-                                    : "none",
-                                  display: "inline-block",
-                                  width: "35px",
-                                  height: "35px",
-                                  backgroundSize: "contain",
-                                  backgroundRepeat: "no-repeat",
-                                  margin: "0 5px",
-                                }}
-                              >
-                                {!typeImagesExist[typeName] && (
-                                  <td>{typeName}</td>
-                                )}
-                              </td>
-                            );
-                          })
-                        ) : (
-                          <span className={styles.label}>Not available</span>
-                        )}
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            {/* Weaknesses */}
-            <div className={styles.details}>
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <td className={styles.subtitle}>Weaknesses</td>
-                    <td>
-                      <ul>
-                        {currentPokemon.weaknesses.length > 0 ? (
-                          currentPokemon.weaknesses.map((weakness, index) => {
-                            const backgroundUrl =
-                              getTypeBackgroundUrl(weakness);
-                            return (
-                              <td
-                                key={index}
-                                title={weakness}
-                                className={styles.type}
-                                style={{
-                                  backgroundImage: weaknessImagesExist[weakness]
-                                    ? `url(${backgroundUrl})`
-                                    : "none",
-                                  display: "inline-block",
-                                  width: "35px",
-                                  height: "35px",
-                                  backgroundSize: "contain",
-                                  backgroundRepeat: "no-repeat",
-                                  margin: "0 5px",
-                                }}
-                              >
-                                {!weaknessImagesExist[weakness] && (
-                                  <td>{weakness}</td>
-                                )}
-                              </td>
-                            );
-                          })
-                        ) : (
-                          <span className={styles.type}>Not available</span>
-                        )}
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bottom-bar-2">
-        {/* Chart */}
-        <div className={styles.detailsEvo}>
-          <div />
-          <div className={styles.chartContainer}>
-            <PokemonStatsChart data={statsData} options={chartOptions} />
-          </div>
-          <div />
-        </div>
-
-        <div className={styles.details}>
-          <p></p>
-        </div>
-
-        {/* Evolutions */}
-        <div className={styles.detailsEvo}>
-          <main className={styles.mainEvo}>
-            <PokemonEvolutionList pokemonId={currentPokemon.id} />
-          </main>
-        </div>
-      </div>
-    </>
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+      <circle cx="10" cy="14" r="5.2" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      <path
+        d="M14.2 9.8L20 4M14.8 4H20v5.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-// Função para obter estilos de item com base na posição
-function getItemStyles(position: enPosition) {
-  if (position === enPosition.FRONT) {
-    return {
-      filter: "blur(10px)",
-      scale: 0.5,
-      zIndex: 3,
-      left: -200,
-      top: "-7%",
-    };
-  }
+function FemaleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+      <circle cx="12" cy="9" r="5.2" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      <path
+        d="M12 14.5v6.5M9 18h6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
-  if (position === enPosition.MIDDLE) {
-    return {
-      left: 200,
-      scale: 0.5,
-      zIndex: 2,
-      top: "-7%",
-    };
-  }
+function AbilityBoltIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+      <path
+        d="M13 2 4 14h7l-1 8 10-13h-7l0-7z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
-  return {
-    filter: "blur(10px)",
-    scale: 0.5,
-    left: -5,
-    opacity: 0.8,
-    zIndex: 1,
-    top: "-20%",
+function AbilityEyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+      <path
+        d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="2.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+export default function Carousel({ activeId }: IProps) {
+  const router = useRouter();
+  const [currentPokemon, setCurrentPokemon] = useState<IPokemon | null>(null);
+  const [visibleItems, setVisibleItems] = useState<IPokemon[]>([]);
+  const [maxId, setMaxId] = useState(1025);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [startX, setStartX] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchDexMeta()
+      .then((meta) => {
+        if (!cancelled) setMaxId(meta.count);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadNeighbors = async () => {
+      setLoading(true);
+      try {
+        const prevId = wrapId(activeId - 1, maxId);
+        const nextId = wrapId(activeId + 1, maxId);
+        const [current, prev, next] = await Promise.all([
+          fetchPokemonById(activeId),
+          fetchPokemonById(prevId),
+          fetchPokemonById(nextId),
+        ]);
+        if (cancelled) return;
+        setCurrentPokemon(current);
+        setVisibleItems([current, next, prev]);
+        setError(null);
+      } catch {
+        if (!cancelled) {
+          setError("Não foi possível carregar este Pokémon.");
+          setCurrentPokemon(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    void loadNeighbors();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeId, maxId]);
+
+  const currentId = currentPokemon?.id;
+  const currentName = currentPokemon?.name;
+
+  useEffect(() => {
+    if (!currentId) return;
+
+    const timer = window.setTimeout(() => {
+      void playAudio(currentId, currentName);
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timer);
+      if (typeof window !== "undefined") {
+        window.speechSynthesis?.cancel();
+      }
+    };
+  }, [currentId, currentName]);
+
+  const goTo = (id: number) => {
+    router.push(`/pokemon/${wrapId(id, maxId)}`);
   };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement) {
+        const tag = event.target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+      }
+      if (event.key === "ArrowLeft") goTo(activeId - 1);
+      if (event.key === "ArrowRight") goTo(activeId + 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeId, maxId, router]);
+
+  if (loading && !currentPokemon) {
+    return <Loader />;
+  }
+
+  if (error || !currentPokemon || visibleItems.length === 0) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.error}>{error || "Pokémon não encontrado."}</p>
+        <Link href="/" className={styles.back}>
+          ← Pokédex
+        </Link>
+      </div>
+    );
+  }
+
+  const genderless =
+    currentPokemon.gender?.male === "Genderless" ||
+    currentPokemon.gender?.female === "Genderless";
+  const prev = visibleItems[2];
+  const next = visibleItems[1];
+
+  const finishSwipe = (endX: number) => {
+    if (!startX) return;
+    const diff = endX - startX;
+    if (Math.abs(diff) < 40) return;
+    goTo(activeId + (diff > 0 ? -1 : 1));
+  };
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarStart}>
+          <Link
+            href="/"
+            className={styles.back}
+            aria-label="Voltar à Pokédex"
+            title="Voltar à Pokédex"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M15 6L9 12L15 18"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
+        <h1 className={styles.title}>
+          {formatName(currentPokemon.name)}{" "}
+          <span>#{formatId(currentPokemon.id)}</span>
+        </h1>
+        <div className={styles.toolbarEnd} aria-hidden />
+      </div>
+
+      <div className={styles.mainGrid}>
+        <section
+          className={styles.carousel}
+          onTouchStart={(event) => setStartX(event.touches[0].clientX)}
+          onTouchEnd={(event) => finishSwipe(event.changedTouches[0].clientX)}
+        >
+          <div className={styles.stage}>
+            {prev ? (
+              <Link
+                href={`/pokemon/${prev.id}`}
+                className={`${styles.slide} ${styles.side}`}
+                aria-label={formatName(prev.name)}
+              >
+                <PokemonPicture pokemon={prev} isMainPage={false} size={140} />
+                <span className={styles.slideName}>{formatName(prev.name)}</span>
+              </Link>
+            ) : null}
+
+            <motion.div
+              key={currentPokemon.id}
+              className={`${styles.slide} ${styles.mainSlide}`}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PokemonPicture pokemon={currentPokemon} isMainPage={false} size={420} />
+            </motion.div>
+
+            {next ? (
+              <Link
+                href={`/pokemon/${next.id}`}
+                className={`${styles.slide} ${styles.side}`}
+                aria-label={formatName(next.name)}
+              >
+                <PokemonPicture pokemon={next} isMainPage={false} size={140} />
+                <span className={styles.slideName}>{formatName(next.name)}</span>
+              </Link>
+            ) : null}
+          </div>
+        </section>
+
+        <div className={styles.detailsColumn}>
+          <article className={`${styles.card} ${styles.aboutCard}`}>
+            <div className={styles.cardHeader}>
+              <h2>Sobre</h2>
+              <div className={styles.typeRow}>
+                {currentPokemon.types.map((entry) => (
+                  <span
+                    key={entry.type.name}
+                    className={styles.typeIcon}
+                    style={{ backgroundColor: getTypeColor(entry.type.name) }}
+                    title={formatName(entry.type.name)}
+                    aria-label={formatName(entry.type.name)}
+                  >
+                    <TypeIcon typeName={entry.type.name} size={28} />
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <p className={styles.description}>
+              {currentPokemon.description || "Descrição indisponível."}
+            </p>
+
+            <dl className={styles.metrics}>
+              <div>
+                <dt>Altura</dt>
+                <dd>
+                  {currentPokemon.height
+                    ? `${(currentPokemon.height / 10).toFixed(1)} m`
+                    : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt>Peso</dt>
+                <dd>
+                  {currentPokemon.weight
+                    ? `${(currentPokemon.weight / 10).toFixed(1)} kg`
+                    : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt>Categoria</dt>
+                <dd>{currentPokemon.category || "—"}</dd>
+              </div>
+            </dl>
+
+            <div className={styles.aboutSplit}>
+              <div className={styles.block}>
+                <span className={styles.blockLabel}>Habilidades</span>
+                <ul className={styles.abilityList}>
+                  {currentPokemon.abilities.length > 0 ? (
+                    currentPokemon.abilities.map((item) => {
+                      const name = formatName(prettyName(item.ability.name));
+                      const label = item.is_hidden ? `${name} (oculta)` : name;
+                      return (
+                        <li key={item.ability.name}>
+                          <span
+                            className={`${styles.abilityIcon} ${item.is_hidden ? styles.hiddenAbility : ""}`}
+                            title={label}
+                            aria-label={label}
+                          >
+                            {item.is_hidden ? <AbilityEyeIcon /> : <AbilityBoltIcon />}
+                          </span>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className={styles.muted}>—</li>
+                  )}
+                </ul>
+              </div>
+
+              <div className={styles.block}>
+                <span className={styles.blockLabel}>Gênero</span>
+                {genderless ? (
+                  <strong>Sem gênero</strong>
+                ) : (
+                  <>
+                    <div className={styles.genderMeter}>
+                      <span
+                        className={`${styles.genderIcon} ${styles.maleIcon}`}
+                        title="Macho"
+                        aria-label={`Macho ${currentPokemon.gender?.male || ""}`.trim()}
+                      >
+                        <MaleIcon />
+                      </span>
+                      <div className={styles.genderBar} aria-hidden>
+                        <span
+                          className={styles.male}
+                          style={{ width: currentPokemon.gender?.male || "0%" }}
+                        />
+                        <span
+                          className={styles.female}
+                          style={{ width: currentPokemon.gender?.female || "0%" }}
+                        />
+                      </div>
+                      <span
+                        className={`${styles.genderIcon} ${styles.femaleIcon}`}
+                        title="Fêmea"
+                        aria-label={`Fêmea ${currentPokemon.gender?.female || ""}`.trim()}
+                      >
+                        <FemaleIcon />
+                      </span>
+                    </div>
+                    <div className={styles.genderLegend}>
+                      <span>{currentPokemon.gender?.male || "—"}</span>
+                      <span>{currentPokemon.gender?.female || "—"}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </article>
+
+          <article className={styles.card}>
+            <h2>Fraquezas</h2>
+            <div className={styles.typeRow}>
+              {currentPokemon.weaknesses.length > 0 ? (
+                currentPokemon.weaknesses.map((weakness) => (
+                  <span
+                    key={weakness}
+                    className={styles.typeIcon}
+                    style={{ backgroundColor: getTypeColor(weakness) }}
+                    title={formatName(weakness)}
+                    aria-label={formatName(weakness)}
+                  >
+                    <TypeIcon typeName={weakness} size={28} />
+                  </span>
+                ))
+              ) : (
+                <p className={styles.muted}>Nenhuma fraqueza listada.</p>
+              )}
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <article className={styles.card}>
+        <h2>Estatísticas</h2>
+        <PokemonStatsChart
+          key={currentPokemon.id}
+          stats={currentPokemon.stats}
+          typeName={currentPokemon.types[0]?.type.name || "normal"}
+        />
+      </article>
+
+      <PokemonEvolutionList pokemonId={currentPokemon.id} />
+    </div>
+  );
 }
