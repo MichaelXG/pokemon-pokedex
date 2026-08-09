@@ -172,8 +172,12 @@ export default function Carousel({ activeId }: IProps) {
         const tag = event.target.tagName;
         if (tag === "INPUT" || tag === "TEXTAREA") return;
       }
-      if (event.key === "ArrowLeft") goTo(activeId - 1);
-      if (event.key === "ArrowRight") goTo(activeId + 1);
+      if (event.key === "ArrowLeft") {
+        router.push(`/pokemon/${wrapId(activeId - 1, maxId)}`);
+      }
+      if (event.key === "ArrowRight") {
+        router.push(`/pokemon/${wrapId(activeId + 1, maxId)}`);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

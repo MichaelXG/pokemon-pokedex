@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { getTypeBackgroundUrl } from "@/utils/typeUtils";
 
 interface TypeIconProps {
@@ -7,7 +9,7 @@ interface TypeIconProps {
 
 export default function TypeIcon({ typeName, size = 24 }: TypeIconProps) {
   return (
-    <img
+    <Image
       src={getTypeBackgroundUrl(typeName)}
       alt=""
       title={typeName}
@@ -15,6 +17,7 @@ export default function TypeIcon({ typeName, size = 24 }: TypeIconProps) {
       height={size}
       aria-hidden
       draggable={false}
+      unoptimized
     />
   );
 }

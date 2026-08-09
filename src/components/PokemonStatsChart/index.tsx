@@ -1,6 +1,7 @@
 import styles from "./pokemonStatsChart.module.scss";
-import { getTypeColor } from "@/utils/typeUtils";
+
 import { IStat } from "@/interfaces/IPokemon";
+import { getTypeColor } from "@/utils/typeUtils";
 
 const LABELS: Record<string, string> = {
   hp: "PS",
