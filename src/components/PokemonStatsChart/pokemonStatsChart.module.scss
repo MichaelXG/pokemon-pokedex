@@ -54,12 +54,55 @@
 
 @media (max-width: 800px) {
   .stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem 0.35rem;
+    padding: 0;
+  }
+
+  .stat {
+    gap: 0.3rem;
+  }
+
+  .label {
+    font-size: 0;
+    line-height: 1;
+
+    &::after {
+      content: attr(data-short);
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+  }
+
+  .gauge {
+    width: min(34px, 100%);
+    gap: 2px;
+
+    li {
+      height: 7px;
+      border-radius: 2px;
+    }
+  }
+
+  .value {
+    font-size: 0.78rem;
   }
 }
 
-@media (max-width: 480px) {
-  .stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 400px) {
+  .gauge {
+    width: min(28px, 100%);
+    gap: 1.5px;
+
+    li {
+      height: 6px;
+    }
+  }
+
+  .label::after {
+    font-size: 0.62rem;
+  }
+
+  .value {
+    font-size: 0.72rem;
   }
 }

@@ -12,6 +12,15 @@ const LABELS: Record<string, string> = {
   speed: "Velocidade",
 };
 
+const SHORT_LABELS: Record<string, string> = {
+  hp: "PS",
+  attack: "Atq",
+  defense: "Def",
+  "special-attack": "SpA",
+  "special-defense": "SpD",
+  speed: "Vel",
+};
+
 const SEGMENTS = 15;
 const MAX_STAT = 180;
 
@@ -37,7 +46,10 @@ export default function PokemonStatsChart({
 
         return (
           <li key={stat.stat.name} className={styles.stat}>
-            <span className={styles.label}>
+            <span
+              className={styles.label}
+              data-short={SHORT_LABELS[stat.stat.name] || stat.stat.name}
+            >
               {LABELS[stat.stat.name] || stat.stat.name}
             </span>
             <ul className={styles.gauge} aria-hidden>

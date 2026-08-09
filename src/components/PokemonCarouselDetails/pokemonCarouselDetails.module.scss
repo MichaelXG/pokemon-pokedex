@@ -78,15 +78,19 @@
   justify-content: center;
   gap: 0.35rem;
   min-height: 26rem;
+  min-width: 0;
+  width: 100%;
   padding: 0.75rem 0;
 }
 
 .stage {
   display: flex;
+  flex-wrap: nowrap;
   align-items: flex-end;
   justify-content: center;
   gap: 0.35rem;
   flex: 1;
+  width: 100%;
   min-width: 0;
 }
 
@@ -105,7 +109,9 @@
 }
 
 .mainSlide {
-  width: min(400px, 62%);
+  flex: 1 1 58%;
+  width: 58%;
+  max-width: 400px;
   z-index: 2;
 
   img {
@@ -114,7 +120,10 @@
 }
 
 .side {
-  width: min(108px, 18%);
+  display: flex;
+  flex: 0 0 18%;
+  width: 18%;
+  max-width: 110px;
   opacity: 0.42;
   transform: translateY(-8px);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -384,16 +393,57 @@
     grid-template-columns: 1fr;
   }
 
-  .side {
-    display: none;
+  .carousel {
+    min-height: 18rem;
+    padding: 0.35rem 0 0.6rem;
+  }
+
+  .stage {
+    gap: 0.2rem;
   }
 
   .mainSlide {
-    width: min(340px, 78%);
+    flex: 1 1 56%;
+    width: 56%;
+    max-width: 280px;
+  }
+
+  .side {
+    display: flex;
+    flex: 0 0 21%;
+    width: 21%;
+    max-width: 96px;
+    opacity: 0.55;
+    transform: translateY(-4px);
+  }
+
+  .slideName {
+    font-size: 0.68rem;
   }
 }
 
 @media (max-width: 560px) {
+  .page {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .carousel {
+    min-height: 15.5rem;
+  }
+
+  .mainSlide {
+    max-width: 220px;
+  }
+
+  .side {
+    max-width: 78px;
+  }
+
+  .card {
+    padding: 0.85rem 0.65rem 1rem;
+  }
+
   .metrics {
     grid-template-columns: 1fr;
 

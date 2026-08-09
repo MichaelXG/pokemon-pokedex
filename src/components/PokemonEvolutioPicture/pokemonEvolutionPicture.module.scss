@@ -2,7 +2,9 @@
   --type-color: #a8a77a;
   display: flex;
   flex-direction: column;
-  width: 196px;
+  width: var(--evo-card-width, 196px);
+  max-width: 100%;
+  height: 100%;
   overflow: visible;
   border-radius: 1.15rem;
   background: #fff;
@@ -23,7 +25,7 @@ a:focus-visible .card {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  min-height: 158px;
+  min-height: var(--evo-hero-min, 158px);
   padding: 1.7rem 0.2rem 0;
   overflow: visible;
   border-radius: 1.15rem 1.15rem 0 0;
@@ -53,8 +55,8 @@ a:focus-visible .card {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(152px, 96%);
-  margin-bottom: -30px;
+  width: min(var(--evo-art, 152px), 96%);
+  margin-bottom: calc(var(--evo-art, 152px) * -0.2);
   aspect-ratio: 1;
 }
 
@@ -107,14 +109,15 @@ a:focus-visible .image {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--evo-type, 32px);
+  height: var(--evo-type, 32px);
+  flex-shrink: 0;
   border-radius: 50%;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 62%;
+    height: 62%;
     padding: 3px;
     border-radius: 50%;
     background: #fff;
@@ -125,4 +128,32 @@ a:focus-visible .image {
 .empty {
   color: rgba(27, 27, 47, 0.5);
   font-size: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding-top: 1.45rem;
+  }
+
+  .body {
+    gap: 0.32rem;
+    padding: 1.55rem 0.4rem 0.65rem;
+  }
+
+  .name {
+    font-size: 0.86rem;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: unset;
+  }
+}
+
+@media (hover: none) {
+  a:hover .card,
+  a:hover .image {
+    transform: none;
+  }
 }
